@@ -4,18 +4,17 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
+require("dotenv").config();
 
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 
 //Database connection
-const mongoURL = "";
+const mongoURL = process.env.mongoURL;
 const mongopath = "e-commerce";
-// mongoose.connect(mongoURL + mongopath);
-
 const connectDB = async () => {
   try {
     await mongoose.connect(mongoURL + mongopath);
@@ -154,7 +153,7 @@ const fetchuser = async (req, res, next) => {
     res.status(401).send({ errors: "Please authenticate using a valid token" });
   } else {
     try {
-      const data = jwt.verify(token, "secret_ecom");
+      const data = jwt.verify(token, process.env.secret);
       req.user = data.user;
       next();
     } catch (error) {
@@ -241,7 +240,7 @@ app.post("/signup", async (req, res) => {
     },
   };
 
-  const token = jwt.sign(data, "secret_ecom");
+  const token = jwt.sign(data, process.env.secret);
   success = true;
   res.json({ success, token });
 });
@@ -261,7 +260,7 @@ app.post("/login", async (req, res) => {
       };
       success = true;
       // console.log(user.id);
-      const token = jwt.sign(data, "secret_ecom");
+      const token = jwt.sign(data, process.env.secret);
       res.json({ success, token });
     } else {
       return res.status(400).json({
