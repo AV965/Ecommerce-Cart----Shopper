@@ -7,20 +7,18 @@ const RelatedProducts = ({ category, id }) => {
 
   useEffect(() => {
     console.log("Category:", category);
-    fetch("http://localhost:4000/relatedproducts", {
+    fetch("https://quikmart-iyy6.onrender.com/relatedproducts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json", // Set headers
       },
       body: JSON.stringify({ category }), // Send the category in the request body
     })
-      .then(resp => resp.json())
-      .then((data) =>{
+      .then((resp) => resp.json())
+      .then((data) => {
         console.log("Related products data:", data); // Log the response data
         setrelatedProducts(data);
       });
-
-      
   }, [category]);
 
   return (
