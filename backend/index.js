@@ -46,12 +46,12 @@ app.get("/", (req, res) => {
 });
 
 //creating upload endpoint
-app.use("/images", express.static("/upload/images"));
+app.use("/images", express.static("upload/images"));
 
 app.post("/upload", upload.single("product"), (req, res) => {
   res.json({
     message: "File uploaded successfully",
-    image_url: `https://quikmart-iyy6.onrender.com/images/${req.file.filename}`,
+    image_url: `/images/${req.file.filename}`,
     success: true,
   });
 });
