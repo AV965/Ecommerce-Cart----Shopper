@@ -38,8 +38,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Route for Images folder
-app.use("/images", express.static("upload/images"));
 
 //APi Creation
 
