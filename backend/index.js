@@ -25,8 +25,6 @@ const connectDB = async () => {
 connectDB();
 
 
-// Route for Images folder
-app.use("/images", express.static("upload/images"));
 
 //APi Creation
 
@@ -34,6 +32,20 @@ app.get("/", (req, res) => {
   res.send("Express App is Running");
 });
 
+<<<<<<< HEAD
+=======
+//creating upload endpoint
+app.use("/images", express.static("upload/images"));
+
+app.post("/upload", upload.single("product"), (req, res) => {
+  res.json({
+    message: "File uploaded successfully",
+    image_url: `/images/${req.file.filename}`,
+    success: true,
+  });
+});
+
+>>>>>>> 95164c70402590f75c1a971fa2c31e004c9a6b90
 // Schema for creating Product
 const Product = mongoose.model("Product", {
   id: { type: Number, required: true },
