@@ -5,7 +5,7 @@ const NewCollections = () => {
   const [new_collection, setNewCollection] = useState([]);
 
   useEffect(() => {
-    fetch("https://quikmart-iyy6.onrender.com/newcollections")
+    fetch("http://localhost:4000/newcollections")
       .then((resp) => resp.json())
       .then((data) => setNewCollection(data));
   }, []);

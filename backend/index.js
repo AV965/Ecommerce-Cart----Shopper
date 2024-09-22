@@ -1,7 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
-const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 require("dotenv").config();
@@ -25,18 +24,6 @@ const connectDB = async () => {
 };
 connectDB();
 
-//Image Storage Engine
-const storage = multer.diskStorage({
-  destination: "./upload/images",
-  filename: (req, file, cb) => {
-    return cb(
-      null,
-      `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
-    );
-  },
-});
-
-const upload = multer({ storage: storage });
 
 // Route for Images folder
 app.use("/images", express.static("upload/images"));
@@ -45,17 +32,6 @@ app.use("/images", express.static("upload/images"));
 
 app.get("/", (req, res) => {
   res.send("Express App is Running");
-});
-
-//creating upload endpoint
-app.use("/images", express.static("/upload/images"));
-
-app.post("/upload", upload.single("product"), (req, res) => {
-  res.json({
-    message: "File uploaded successfully",
-    image_url: `https://quikmart-iyy6.onrender.com/images/${req.file.filename}`,
-    success: true,
-  });
 });
 
 // Schema for creating Product
@@ -73,11 +49,9 @@ const Product = mongoose.model("Product", {
 
 // Create an endpoint for adding products using admin panel
 app.post("/addproduct", async (req, res) => {
-  console.log("addproduct");
   let id,
     products = await Product.find({});
 
-  console.log(products);
   if (products.length > 0) {
     let last_product_array = products.slice(-1);
     let last_product = last_product_array[0];
@@ -94,11 +68,9 @@ app.post("/addproduct", async (req, res) => {
     new_price: req.body.new_price,
     old_price: req.body.old_price,
   });
-  console.log(product);
 
   // Save the new product to the database
   await product.save();
-  console.log("Product saved:", product.name);
   // Send a success response
   res.json({
     success: true,
@@ -110,14 +82,12 @@ app.post("/addproduct", async (req, res) => {
 // Create an endpoint for removing products using admin panel
 app.post("/removeproduct", async (req, res) => {
   await Product.findOneAndDelete({ id: req.body.id });
-  console.log("Removed");
   res.json({ success: true, name: req.body.name });
 });
 
 // endpoint for getting all products data
 app.get("/allproducts", async (req, res) => {
   let products = await Product.find({});
-  console.log("All Products");
   res.send(products);
 });
 
@@ -125,7 +95,6 @@ app.get("/allproducts", async (req, res) => {
 app.get("/newcollections", async (req, res) => {
   let products = await Product.find({});
   let arr = products.slice(0).slice(-8);
-  console.log("New Collections");
   res.send(arr);
 });
 
@@ -133,14 +102,11 @@ app.get("/newcollections", async (req, res) => {
 app.get("/popularinmen", async (req, res) => {
   let products = await Product.find({ category: "men" });
   let arr = products.splice(0, 4);
-  console.log("Popular In men");
   res.send(arr);
 });
 
 // endpoint for getting related products data
 app.post("/relatedproducts", async (req, res) => {
-  console.log("Related Products");
-  const { category } = req.body;
   const products = await Product.find({ category: req.body.category });
   const arr = products.slice(0, 4);
   res.send(arr);
@@ -166,8 +132,6 @@ const fetchuser = async (req, res, next) => {
 
 // Create an endpoint for saving the product in cart
 app.post("/addtocart", fetchuser, async (req, res) => {
-  console.log("Add Cart", req.body.itemId);
-  // console.log(req.body,req.user);
 
   let userData = await Users.findOne({ _id: req.user.id });
   userData.cartData[req.body.itemId] += 1;
@@ -175,13 +139,11 @@ app.post("/addtocart", fetchuser, async (req, res) => {
     { _id: req.user.id },
     { cartData: userData.cartData }
   );
-  console.log("added to cart");
   res.send("Added");
 });
 
 // Create an endpoint for removing the product in cart
 app.post("/removefromcart", fetchuser, async (req, res) => {
-  console.log("Remove Cart", req.body.itemId);
   let userData = await Users.findOne({ _id: req.user.id });
   if (userData.cartData[req.body.itemId] > 0) {
     userData.cartData[req.body.itemId] -= 1;
@@ -190,13 +152,11 @@ app.post("/removefromcart", fetchuser, async (req, res) => {
     { _id: req.user.id },
     { cartData: userData.cartData }
   );
-  console.log("removed from cart");
   res.send("Removed");
 });
 
 // Create an endpoint for getting cartdata of user
 app.post("/getcart", fetchuser, async (req, res) => {
-  console.log("Get Cart");
   let userData = await Users.findOne({ _id: req.user.id });
   res.json(userData.cartData);
 });
@@ -212,7 +172,6 @@ const Users = mongoose.model("Users", {
 
 //Create an endpoint at ip/auth for regestring the user & sending auth-token
 app.post("/signup", async (req, res) => {
-  console.log("Sign Up");
   let success = false;
   let check = await Users.findOne({ email: req.body.email });
   if (check) {
@@ -247,7 +206,6 @@ app.post("/signup", async (req, res) => {
 
 // Create an endpoint at ip/login for login the user and giving auth-token
 app.post("/login", async (req, res) => {
-  console.log("Login");
   let success = false;
   let user = await Users.findOne({ email: req.body.email });
   if (user) {
@@ -259,7 +217,6 @@ app.post("/login", async (req, res) => {
         },
       };
       success = true;
-      // console.log(user.id);
       const token = jwt.sign(data, process.env.secret);
       res.json({ success, token });
     } else {

@@ -2,10 +2,21 @@ import React, { useState } from "react";
 import "./AddProduct.css";
 import upload_area from "../../assets/upload_area.svg";
 
+import { toast } from "react-toastify";
+import upload from "../../lib/upload";
+
 const AddProduct = () => {
-  const [image, setImage] = useState(null);
+  const [image, setImage] = useState({
+    file: null,
+    url: "",
+  });
   const imageHandler = (e) => {
-    setImage(e.target.files[0]);
+    if (e.target.files[0]) {
+      setImage({
+        file: e.target.files[0],
+        url: URL.createObjectURL(e.target.files[0]),
+      });
+    }
   };
   const [productDetails, setProductDetails] = useState({
     name: "",
@@ -20,52 +31,30 @@ const AddProduct = () => {
     setProductDetails({ ...productDetails, [e.target.name]: e.target.value });
   };
 
-  const [errorMessage, setErrorMessage] = useState("");
-
   const Add_Product = async () => {
     try {
-      console.log(productDetails);
-
-      let responseData;
       let product = productDetails;
-      let formData = new FormData();
-      formData.append("product", image);
+      const imgUrl = await upload(image.file);
 
-      await fetch("https://quikmart-iyy6.onrender.com/upload", {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-        },
-        body: formData,
-      })
-        .then((resp) => resp.json())
-        .then((data) => {
-          responseData = data;
-          console.log("DAta Updated", responseData);
-        });
-      console.log("Response Status:", responseData.success);
-
-      if (responseData.success) {
-        product.image = responseData.image_url;
-        console.log(product);
-        await fetch("https://quikmart-iyy6.onrender.com/addproduct", {
+      if (imgUrl) {
+        product.image = imgUrl;
+        await fetch("http://localhost:4000/addproduct", {
           method: "POST",
           headers: {
-            // Accept: "application/json",
             "Content-Type": "application/json",
           },
           body: JSON.stringify(product),
         })
           .then((resp) => resp.json())
           .then((data) => {
-            console.log(data);
-            data.success ? console.log("Product Added") : console.log("Failed");
+            data.success
+              ? toast.success("Product Added")
+              : toast.error("Failed");
           });
       }
     } catch (error) {
-      console.error("Error:", error);
-      setErrorMessage(error.message);
-      alert(`An error occurred: ${error.message}`);
+      console.log(error);
+      toast.error(error.message);
     }
   };
 
@@ -131,7 +120,7 @@ const AddProduct = () => {
         <label htmlFor="file-input">
           <img
             className="addproduct-thumbnail-img"
-            src={!image ? upload_area : URL.createObjectURL(image)}
+            src={image.url || upload_area}
             alt=""
           />
         </label>
@@ -144,11 +133,7 @@ const AddProduct = () => {
           hidden
         />
       </div>
-      {errorMessage && (
-        <div className="error-message">
-          <p>Error: {errorMessage}</p>
-        </div>
-      )}
+
       <button className="addproduct-btn" onClick={Add_Product}>
         ADD
       </button>

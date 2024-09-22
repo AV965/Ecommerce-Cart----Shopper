@@ -7,7 +7,7 @@ const RelatedProducts = ({ category, id }) => {
 
   useEffect(() => {
     console.log("Category:", category);
-    fetch("https://quikmart-iyy6.onrender.com/relatedproducts", {
+    fetch("http://localhost:4000/relatedproducts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json", // Set headers

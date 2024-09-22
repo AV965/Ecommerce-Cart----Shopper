@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import "./ListProduct.css";
 import cross_icon from "../../assets/cross_icon.png";
-// import { backend_url, currency } from "../../App";
-var currency = "$";
+var currency = "₹";
 
 const ListProduct = () => {
   const [allproducts, setAllProducts] = useState([]);
 
   const fetchInfo = async () => {
-    await fetch(`https://quikmart-iyy6.onrender.com/allproducts`)
+    await fetch(`http://localhost:4000/allproducts`)
       .then((res) => res.json())
       .then((data) => setAllProducts(data));
   };
@@ -18,7 +17,7 @@ const ListProduct = () => {
   }, []);
 
   const removeProduct = async (id) => {
-    await fetch(`https://quikmart-iyy6.onrender.com/removeproduct`, {
+    await fetch(`http://localhost:4000/removeproduct`, {
       method: "POST",
       headers: {
         Accept: "application/json",
