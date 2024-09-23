@@ -7,7 +7,7 @@ const ListProduct = () => {
   const [allproducts, setAllProducts] = useState([]);
 
   const fetchInfo = async () => {
-    await fetch(`https://quikmart-iyy6.onrender.com//allproducts`)
+    await fetch(`https://quikmart-iyy6.onrender.com/allproducts`)
       .then((res) => res.json())
       .then((data) => setAllProducts(data));
   };
@@ -17,7 +17,7 @@ const ListProduct = () => {
   }, []);
 
   const removeProduct = async (id) => {
-    await fetch(`https://quikmart-iyy6.onrender.com//removeproduct`, {
+    await fetch(`https://quikmart-iyy6.onrender.com/removeproduct`, {
       method: "POST",
       headers: {
         Accept: "application/json",

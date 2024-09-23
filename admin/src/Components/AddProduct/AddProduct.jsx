@@ -38,7 +38,7 @@ const AddProduct = () => {
 
       if (imgUrl) {
         product.image = imgUrl;
-        await fetch("https://quikmart-iyy6.onrender.com//addproduct", {
+        await fetch("https://quikmart-iyy6.onrender.com/addproduct", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
